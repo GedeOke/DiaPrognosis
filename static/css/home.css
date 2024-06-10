@@ -1,0 +1,84 @@
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #1a202c;
+    color: #e2e8f0;
+    font-family: 'Inter', sans-serif;
+    overflow: hidden;
+}
+
+.content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+}
+
+.custom-input {
+    background-color: #2d3748;
+    border-color: #4a5568;
+    color: #e2e8f0;
+}
+
+.custom-input::placeholder {
+    color: #a0aec0;
+}
+
+.custom-input:focus {
+    border-color: #63b3ed;
+    background-color: #2d3748;
+    color: #e2e8f0;
+}
+
+.chat-icon {
+    max-width: 120px;
+    margin: 0 auto 20px;
+}
+
+.btn-primary {
+    background-color: #3182ce;
+    color: #ffffff;
+}
+
+.btn-primary:hover {
+    background-color: #2b6cb0;
+}
+
+.fade-out {
+    animation: fadeOut 1s forwards;
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+.footer {
+    text-align: center;
+    padding: 20px 0;
+    background-color: #2d3748;
+    color: #e2e8f0;
+}
+
+.footer a {
+    color: #63b3ed;
+    text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+    .content {
+        padding: 10px;
+    }
+
+    .btn-primary {
+        padding: 10px;
+    }
+}

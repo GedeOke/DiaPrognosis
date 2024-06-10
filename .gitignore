@@ -1,0 +1,7 @@
+model/prediksi_diabetes.ipynb
+database/__pycache__
+database/database.db
+DiaPrognosis_IBM.py
+test
+templates/login.html
+templates/register.html
