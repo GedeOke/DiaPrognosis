@@ -139,13 +139,19 @@ def predict():
             headers={'Authorization': 'Bearer ' + mltoken}
         )
 
-        prediction = response_scoring.json()['predictions'][0]['values'][0][0]
+        try:
+            prediction = response_scoring.json()['predictions'][0]['values'][0][0]
 
-        # Interpret prediction
-        if prediction == 0:
-            result = 'Tidak menderita diabetes'
-        else:
-            result = 'Menderita diabetes'
+            # Interpret prediction
+            if prediction == 0:
+                result = 'Tidak menderita diabetes'
+            else:
+                result = 'Menderita diabetes'
+
+        except KeyError as e:
+            # Handle missing 'predictions' key
+            print(f"KeyError: {e}")
+            result = 'Error: Prediksi tidak berhasil, silakan coba lagi.'
 
         # Store the form inputs and the prediction result in the database
         insert_message('User', f"Form Input: Age={age}, BMI={bmi}, Hypertension={hypertension}, Heart Disease={heart_disease}, Smoking History={smoking_history}, Blood Glucose Level={blood_glucose_level}, HbA1c Level={HbA1c_level}, Gender={gender}")
