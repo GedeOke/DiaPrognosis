@@ -1,21 +1,20 @@
 import { displayMessage } from './components/displayMessage.js';
 import { botResponse } from './components/botResponse.js';
+import { saveMessageToSessionStorage } from './components/saveMessageToSessionStorage.js';
+import { loadMessagesFromSessionStorage } from './components/loadMessagesFromSessionStorage.js';
 
 document.addEventListener('DOMContentLoaded', (event) => {
     initializeChat();
-    const urlParams = new URLSearchParams(window.location.search);
-    const initialMessage = urlParams.get('message');
-    if (initialMessage) {
-        displayMessage('User', initialMessage, 'right');
-        botResponse(initialMessage).then(botMessage => {
-            saveMessageToSessionStorage('Diaprognosis', botMessage, 'left');
-        });
-    }
-
     loadMessagesFromSessionStorage();
+
+    const initialMessage = sessionStorage.getItem('initialMessage');
+    if (initialMessage) {
+        sendMessage(initialMessage, true); // Send the message immediately
+        sessionStorage.removeItem('initialMessage'); // Ensure message is processed only once
+    }
 });
 
-document.getElementById('sendButton').addEventListener('click', sendMessage);
+document.getElementById('sendButton').addEventListener('click', () => sendMessage());
 document.getElementById('inputField').addEventListener('keypress', (event) => {
     if (event.key === 'Enter') {
         event.preventDefault();
@@ -23,10 +22,11 @@ document.getElementById('inputField').addEventListener('keypress', (event) => {
     }
 });
 
-function sendMessage() {
+function sendMessage(initialMessage = '', isInitial = false) {
     const inputField = document.getElementById('inputField');
-    const message = inputField.value;
-    inputField.value = '';
+    const message = isInitial ? initialMessage : inputField.value;
+    if (!isInitial) inputField.value = '';
+
     if (message.trim() === '') return;
 
     displayMessage('User', message, 'right');
@@ -37,24 +37,11 @@ function sendMessage() {
 }
 
 function initializeChat() {
-    document.getElementById('sendButton').addEventListener('click', sendMessage);
+    document.getElementById('sendButton').addEventListener('click', () => sendMessage());
     document.getElementById('inputField').addEventListener('keypress', (event) => {
         if (event.key === 'Enter') {
             event.preventDefault();
             sendMessage();
         }
-    });
-}
-
-function saveMessageToSessionStorage(name, message, position) {
-    const messages = JSON.parse(sessionStorage.getItem('chatMessages')) || [];
-    messages.push({ name, message, position });
-    sessionStorage.setItem('chatMessages', JSON.stringify(messages));
-}
-
-function loadMessagesFromSessionStorage() {
-    const messages = JSON.parse(sessionStorage.getItem('chatMessages')) || [];
-    messages.forEach(msg => {
-        displayMessage(msg.name, msg.message, msg.position);
     });
 }

@@ -1,6 +1,3 @@
-// botResponse.js
-import { createForm } from './createForm.js';
-
 export function botResponse(userMessage) {
     return new Promise((resolve, reject) => {
         const messagesDiv = document.getElementById('messages');
@@ -28,7 +25,7 @@ export function botResponse(userMessage) {
             } else if (userMessage.toLowerCase().includes('prediksi')) {
                 botMessage = 'Silakan isi form berikut untuk prediksi diabetes:';
                 botMessageDiv.querySelector('.bubble').innerText = botMessage;
-                createForm(messagesDiv);
+                // Create form logic can go here if needed
                 resolve(botMessage);
             } else {
                 fetch('/chat-response', {

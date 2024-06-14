@@ -14,16 +14,24 @@
         <img src="static/img/Logo_DiaPrognosis.png" alt="Diabetes Logo" class="chat-icon animate__animated animate__fadeIn">
         <h1 class="animate__animated animate__fadeInUp text-3xl font-bold mb-4">DiaPrognosis</h1>
         <p class="animate__animated animate__fadeInUp text-lg mb-6 animate__delay-1s">Sahabat Anda dalam memprediksi diabetes dan memberikan wawasan kesehatan.</p>
-        <form id="chatForm" action="/chat" method="get" class="w-full max-w-sm mx-auto animate__animated animate__fadeInUp animate__delay-2s">
-            <input type="text" name="message" placeholder="Apa yang bisa saya bantu hari ini?" class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4 custom-input">
+        <form id="chatForm" onsubmit="handleFormSubmit(event)" method="get" class="w-full max-w-sm mx-auto animate__animated animate__fadeInUp animate__delay-2s">
+            <input type="text" name="message" id="message" placeholder="Apa yang bisa saya bantu hari ini?" class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4 custom-input">
             <button type="submit" class="btn-primary w-full py-3 px-6 rounded transition duration-300 ease-in-out transform hover:scale-105">Mulai Percakapan</button>
         </form>
     </div>
     <footer class="footer">
         <p>Developed by Team 14 for Massive Project from Infinite Learning. Last updated: Jun 14, 2024.<br>
-            View on <a href="https://github.com/GedeOke/Massive-Project-Website-Chatbot-for-Diabetes-Prediction" target="_blank">GitHub</a>.
+            View on <a href="https://github.com/GedeOke/DiaPrognosis" target="_blank">GitHub</a>.
         </p>
     </footer>
     <script type="module" src="../static/js/home.js"></script>
+    <script>
+        function handleFormSubmit(event) {
+            event.preventDefault();
+            const message = document.getElementById('message').value;
+            sessionStorage.setItem('initialMessage', message);
+            window.location.href = "/chat";
+        }
+    </script>
 </body>
 </html>

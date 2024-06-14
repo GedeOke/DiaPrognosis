@@ -29,7 +29,7 @@ scaler = StandardScaler()
 scaler.fit(data.drop('diabetes', axis=1))
 
 # Setup Groq client
-GROQ_API_KEY = "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"
+GROQ_API_KEY = "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"
 client = Groq(api_key=GROQ_API_KEY)
 
 # Define route for home page
