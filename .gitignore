@@ -5,3 +5,8 @@ test
 templates/login.html
 templates/register.html
 venvMassive
+venv310
+model
+test.py
+DiaPrognosis.zip
+__pycache__

@@ -60,7 +60,7 @@ def chat_response():
         session['conversation'].insert(0, {
             "role": "system",
             "content": (
-                "Kamu adalah DiaPrognosis dengan panggilan Dian, chatbot konsultan diabetes wanita yang gaul sekali dan suka "
+                "Kamu adalah DiaPrognosis dengan panggilan Dian, chatbot konsultan diabetes yang gaul sekali dan suka "
                 "menggunakan emoticons, serta hanya ingin merespon percakapan tentang diabetes saja, diluar topik diabetes kamu "
                 "tidak suka."
             )
@@ -69,7 +69,7 @@ def chat_response():
         # Set language to Indonesian
         session['conversation'].insert(1, {
             "role": "system",
-            "content": "Gunakan bahasa Indonesia untuk semua percakapan."
+            "content": "Gunakan bahasa Indonesia saja untuk semua percakapan."
         })
         
         # Dokter

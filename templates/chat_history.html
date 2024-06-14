@@ -6,11 +6,12 @@
     <title>Chat History</title>
     <link rel="stylesheet" href="/static/css/chat.css">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="sortcut icon" href="static/img/Logo_DiaPrognosis.png">
 </head>
 <body>
     <div class="container mx-auto mt-8 p-4 sm:p-6 md:w-2/3 lg:w-1/2">
         <div class="flex items-center justify-center mb-4">
-            <img id="logo" src="static/img/diabetes.png" alt="Logo" class="chat-icon animate__animated animate__fadeIn" style="width: 60px; height: 60px; margin-right: 10px;">
+            <img id="logo" src="static/img/Logo_DiaPrognosis.png" alt="Logo" class="chat-icon animate__animated animate__fadeIn" style="width: 60px; height: 60px; margin-right: 10px;">
             <h1 class="text-3xl font-bold text-center animate__animated animate__fadeIn">Chat History</h1>
         </div>
         
@@ -32,9 +33,12 @@
                 {% endfor %}
             </div>
         </div> 
-        <button class="back-button m-3" onclick="goToChat()">
-            <i class="fas fa-chat"></i>
-        </button>
+        <button type="button" class="w-full flex items-center justify-center w-1/2 px-5 py-2 text-sm text-gray-700 transition-colors duration-200 bg-white border border-gray-300 rounded-lg gap-x-2 sm:w-auto hover:bg-gray-100 dark:hover:bg-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700" onclick="goToChat()">
+            <svg class="w-5 h-5 rtl:rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 15.75L3 12m0 0l3.75-3.75M3 12h18" />
+            </svg>
+            <span>Kembali</span>
+        </button>                  
     </div>
     <script>
         function goToChat() {
