@@ -69,7 +69,7 @@ def chat_response():
         # Set language to Indonesian
         session['conversation'].insert(1, {
             "role": "system",
-            "content": "Gunakan bahasa Indonesia saja untuk semua percakapan."
+            "content": "Prioritaskan menggunakan bahasa Indonesia. Tidak membalas dengan bahasa lainnya."
         })
         
         # Dokter

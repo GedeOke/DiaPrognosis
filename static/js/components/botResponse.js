@@ -1,3 +1,5 @@
+import { createForm } from './createForm.js';
+
 export function botResponse(userMessage) {
     return new Promise((resolve, reject) => {
         const messagesDiv = document.getElementById('messages');
@@ -14,18 +16,14 @@ export function botResponse(userMessage) {
         logo.classList.add('logo-scale');
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
 
-        const typingDuration = 2000;
+        const typingDuration = 2500;
 
         setTimeout(() => {
             let botMessage;
-            if (userMessage.toLowerCase().includes('halo')) {
-                botMessage = 'Halo! Saya adalah Chatbot Prediksi Diabetes. Apakah ada yang bisa saya bantu?';
-                botMessageDiv.querySelector('.bubble').innerText = botMessage;
-                resolve(botMessage);
-            } else if (userMessage.toLowerCase().includes('prediksi')) {
+            if (userMessage.toLowerCase().includes('prediksi')) {
                 botMessage = 'Silakan isi form berikut untuk prediksi diabetes:';
                 botMessageDiv.querySelector('.bubble').innerText = botMessage;
-                // Create form logic can go here if needed
+                createForm(messagesDiv);
                 resolve(botMessage);
             } else {
                 fetch('/chat-response', {

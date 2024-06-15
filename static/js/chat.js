@@ -1,6 +1,6 @@
 import { displayMessage } from './components/displayMessage.js';
 import { botResponse } from './components/botResponse.js';
-import { saveMessageToSessionStorage } from './components/saveMessageToSessionStorage.js';
+import { saveMessageToSessionStorage, deleteAllMessagesFromSessionStorage } from './components/saveMessageToSessionStorage.js';
 import { loadMessagesFromSessionStorage } from './components/loadMessagesFromSessionStorage.js';
 
 document.addEventListener('DOMContentLoaded', (event) => {
@@ -21,6 +21,7 @@ document.getElementById('inputField').addEventListener('keypress', (event) => {
         sendMessage();
     }
 });
+document.getElementById('deleteButton').addEventListener('click', () => deleteAllMessages());
 
 function sendMessage(initialMessage = '', isInitial = false) {
     const inputField = document.getElementById('inputField');
@@ -44,4 +45,10 @@ function initializeChat() {
             sendMessage();
         }
     });
+}
+
+function deleteAllMessages() {
+    const messagesDiv = document.getElementById('messages');
+    messagesDiv.innerHTML = '';
+    deleteAllMessagesFromSessionStorage();
 }
