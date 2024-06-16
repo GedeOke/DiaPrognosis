@@ -6,16 +6,9 @@ body {
     color: #e2e8f0;
     font-family: 'Inter', sans-serif;
     overflow: hidden;
-}
-
-.content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    padding: 20px;
+    margin: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 .custom-input {
@@ -62,10 +55,13 @@ body {
 }
 
 .footer {
-    text-align: center;
-    padding: 20px 0;
     background-color: #2d3748;
     color: #e2e8f0;
+    padding: 20px 0;
+    text-align: center;
+    width: 100%;
+    position: relative;
+    bottom: 0;
 }
 
 .footer a {
@@ -81,4 +77,8 @@ body {
     .btn-primary {
         padding: 10px;
     }
+}
+
+.flex-grow {
+    flex-grow: 1;
 }

@@ -33,18 +33,22 @@
                 Semua</button>
         </div>
     </div>
-    <button
-        class="back-button m-3 p-2 md:p-3 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-400"
-        onclick="goToHome()">
-        <i class="fas fa-home text-lg md:text-xl"></i>
-    </button>
 
-    <div class="flex justify-center mt">
-        <button class="history-button m-3 p-2 md:p-3 rounded-full bg-blue-500 hover:bg-blue-700 font-bold rounded focus:outline-none focus:ring-2 focus:ring-gray-400" onclick="goToHistory()">
+    <div class="fixed top-0 left-0 m-3">
+        <button class="p-2 md:p-3 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-400"
+            onclick="goToHome()">
+            <i class="fas fa-home text-lg md:text-xl"></i>
+        </button>
+    </div>
+
+    <div class="fixed top-0 right-0 m-3">
+        <button
+            class="p-2 md:p-3 rounded-full font-bold rounded focus:outline-none focus:ring-2 focus:ring-gray-400"
+            onclick="goToHistory()">
             <i class="fas fa-history text-lg md:text-xl"></i>
             History
         </button>
-    </div>    
+    </div>
 
     <script>
         function goToHome() {
