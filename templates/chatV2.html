@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,28 +10,42 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="sortcut icon" href="static/img/Logo_DiaPrognosis.png">
 </head>
+
 <body>
     <div class="container mx-auto mt-8 p-4 sm:p-6 md:w-2/3 lg:w-1/2">
         <div class="flex items-center justify-center mb-4">
-            <img id="logo" src="static/img/Logo_DiaPrognosis.png" alt="Logo" class="chat-icon animate__animated animate__fadeIn" style="width: 60px; height: 60px; margin-right: 10px;">
+            <img id="logo" src="static/img/Logo_DiaPrognosis.png" alt="Logo"
+                class="chat-icon animate__animated animate__fadeIn"
+                style="width: 60px; height: 60px; margin-right: 10px;">
             <h1 class="text-3xl font-bold text-center animate__animated animate__fadeIn">DiaPrognosis</h1>
         </div>
-        
+
         <div id="chatbot" class="flex-1 bg-white p-4 rounded-lg shadow-md">
             <div id="messages" class="overflow-y-auto"></div>
-        </div> 
-        <div id="userInput" class="flex space-x-2 mt-4">
-            <input type="text" id="inputField" placeholder="Ketik pesan..." class="flex-grow shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-            <button id="sendButton" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Kirim</button>
-            <button id="deleteButton" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Hapus Semua</button>
+        </div>
+        <div id="userInput" class="flex flex-col sm:flex-row sm:space-x-2 mt-4">
+            <input type="text" id="inputField" placeholder="Ketik pesan..."
+                class="flex-grow shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+            <button id="sendButton"
+                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-2 sm:mt-0 sm:w-auto">Kirim</button>
+            <button id="deleteButton"
+                class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-2 sm:mt-0 sm:w-auto">Hapus
+                Semua</button>
         </div>
     </div>
-    <button class="back-button m-3" onclick="goToHome()">
-        <i class="fas fa-home"></i>
+    <button
+        class="back-button m-3 p-2 md:p-3 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-400"
+        onclick="goToHome()">
+        <i class="fas fa-home text-lg md:text-xl"></i>
     </button>
-    <button class="history-button m-3" onclick="goToHistory()">
-        <i class="fas fa-history"></i> History
-    </button>
+
+    <div class="flex justify-center mt">
+        <button class="history-button m-3 p-2 md:p-3 rounded-full bg-blue-500 hover:bg-blue-700 font-bold rounded focus:outline-none focus:ring-2 focus:ring-gray-400" onclick="goToHistory()">
+            <i class="fas fa-history text-lg md:text-xl"></i>
+            History
+        </button>
+    </div>    
+
     <script>
         function goToHome() {
             window.location.href = "/";
@@ -41,4 +56,5 @@
     </script>
     <script type="module" src="/static/js/chat.js"></script>
 </body>
+
 </html>
