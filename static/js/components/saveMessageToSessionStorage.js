@@ -1,6 +1,7 @@
 export function saveMessageToSessionStorage(name, message, position) {
     const messages = JSON.parse(sessionStorage.getItem('chatMessages')) || [];
-    messages.push({ name, message, position });
+    const encodedMessage = message.replace(/\n/g, '<br>'); // Encode newlines as <br>
+    messages.push({ name, message: encodedMessage, position });
     sessionStorage.setItem('chatMessages', JSON.stringify(messages));
 }
 
