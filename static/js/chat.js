@@ -15,17 +15,19 @@ document.addEventListener('DOMContentLoaded', (event) => {
         createForm(messagesDiv, formPosition);
     }
 
-    // // Check if prediction result was stored
-    // const predictionResult = sessionStorage.getItem('predictionResult');
-    // if (predictionResult) {
-    //     const resultDiv = document.createElement('div');
-    //     resultDiv.className = 'message left';
-    //     resultDiv.innerHTML = `
-    //         <div class="name">Chatbot</div>
-    //         <div class="bubble">Hasil prediksi: ${predictionResult}</div>
-    //     `;
-    //     messagesDiv.appendChild(resultDiv);
-    // }
+    // Check if prediction result was saved in session storage
+    const predictionResult = sessionStorage.getItem('predictionResult');
+    const resultPosition = parseInt(sessionStorage.getItem('resultPosition'), 10);
+    if (predictionResult && resultPosition !== null) {
+        const messagesDiv = document.getElementById('messages');
+        const resultDiv = document.createElement('div');
+        resultDiv.className = 'message left';
+        resultDiv.innerHTML = `
+            <div class="name">Chatbot</div>
+            <div class="bubble">Hasil prediksi: ${predictionResult}</div>
+        `;
+        messagesDiv.insertBefore(resultDiv, messagesDiv.children[resultPosition]);
+    }
 
     // Ensure scroll to the bottom
     setTimeout(() => {

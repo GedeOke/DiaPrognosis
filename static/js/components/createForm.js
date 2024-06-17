@@ -111,8 +111,10 @@ async function submitForm(event) {
         `;
         document.getElementById('messages').appendChild(resultDiv);
 
-        // Save prediction result to sessionStorage
-        // sessionStorage.setItem('predictionResult', result.prediction);
+        // Save prediction result and position to session storage
+        sessionStorage.setItem('predictionResult', result.prediction);
+        const resultPosition = Array.from(messagesDiv.children).indexOf(resultDiv);
+        sessionStorage.setItem('resultPosition', resultPosition);
 
         // Ensure scroll to the bottom
         setTimeout(() => {
