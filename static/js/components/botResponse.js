@@ -16,11 +16,11 @@ export function botResponse(userMessage) {
         logo.classList.add('logo-scale');
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
 
-        const typingDuration = 2500;
+        const typingDuration = 2000;
 
         setTimeout(() => {
             let botMessage;
-            if (userMessage.toLowerCase().includes('prediksi')) {
+            if (userMessage.toLowerCase().includes('/prediksi')) {
                 botMessage = 'Silakan isi form berikut untuk prediksi diabetes:';
                 botMessageDiv.querySelector('.bubble').innerText = botMessage;
                 createForm(messagesDiv);

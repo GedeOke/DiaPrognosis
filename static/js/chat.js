@@ -29,11 +29,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
         messagesDiv.insertBefore(resultDiv, messagesDiv.children[resultPosition]);
     }
 
-    // Ensure scroll to the bottom
-    setTimeout(() => {
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
-    }, 100); // Adjust the delay if needed
-
     const initialMessage = sessionStorage.getItem('initialMessage');
     if (initialMessage) {
         sendMessage(initialMessage, true); // Send the message immediately

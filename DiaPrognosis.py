@@ -1,27 +1,26 @@
+from functools import wraps
 import os
-from flask import Flask, render_template, request, jsonify, session
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for, flash
+from werkzeug.security import generate_password_hash, check_password_hash
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler
 import requests
-import warnings
 from groq import Groq
-from database.database import init_db, insert_message, get_all_messages
+from database.db import init_db, insert_message, get_messages_by_user, insert_user, get_user
 
+import warnings
 warnings.filterwarnings('ignore')
 
 app = Flask(__name__)
-app.secret_key = os.urandom(24)  # Secret key for session management
+app.secret_key = os.urandom(24)
 
-# Initialize database for chat history
-init_db()
-
-# Load dataset
+# Load data
 data = pd.read_csv('Data/diabetes_prediction_dataset.csv')
 
 # Replace values in 'smoking_history' and 'gender' columns
-data['smoking_history'].replace({'never': 2, 'No Info': 3, 'current': 4, 'former': 5,
-                                'not current': 6, 'ever': 7}, inplace=True)
+data['smoking_history'].replace(
+    {'never': 2, 'No Info': 3, 'current': 4, 'former': 5, 'not current': 6, 'ever': 7}, inplace=True)
 data['gender'].replace({'Male': 2, 'Female': 3, 'Other': 3}, inplace=True)
 
 # Feature Scaling Using StandardScaler
@@ -32,74 +31,124 @@ scaler.fit(data.drop('diabetes', axis=1))
 GROQ_API_KEY = "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"
 client = Groq(api_key=GROQ_API_KEY)
 
-# Define route for home page
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'username' not in session:
+            return redirect(url_for('login', next=request.url))
+        return f(*args, **kwargs)
+    return decorated_function
+
+
 @app.route('/')
+@login_required
+def base():
+    return render_template('home.html')
+
+
+@app.route('/home')
+@login_required
 def home():
-    return render_template('index.html')
+    return render_template('home.html')
 
-# Define route for chat page
+
 @app.route('/chat')
+@login_required
 def chat():
-    return render_template('chatV2.html')
+    return render_template('chatroom.html')
 
-# Define route for chat response
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        hashed_password = generate_password_hash(
+            password, method='pbkdf2:sha256')
+
+        insert_user(username, hashed_password)
+        flash('Registration successful! Please login.', 'success')
+        return redirect(url_for('login'))
+
+    return render_template('register.html')
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        user = get_user(username)
+
+        if user and check_password_hash(user[2], password):
+            session['username'] = username
+            next_page = request.args.get('next')
+            return redirect(next_page or url_for('home'))
+        else:
+            flash('Login failed. Check your username and/or password.', 'danger')
+
+    return render_template('login.html')
+
+
+@app.route('/logout')
+def logout():
+    session.pop('username', None)
+    flash('You have been logged out.', 'info')
+    return redirect(url_for('login'))
+
+
 @app.route('/chat-response', methods=['POST'])
+@login_required
 def chat_response():
     if request.method == 'POST':
         user_message = request.form['message']
+        username = session.get('username', 'User')
+
         if 'conversation' not in session:
             session['conversation'] = []
 
-        # Add the user message to the conversation history
         session['conversation'].append(
             {"role": "user", "content": user_message})
-        
-        # Store the user message in the database
-        insert_message('User', user_message)
+        insert_message(username, user_message, 'user')
 
-        session['conversation'].insert(0, {
-            "role": "system",
-            "content": (
-                "Kamu adalah DiaPrognosis dengan panggilan Dian, chatbot konsultan diabetes yang gaul sekali dan suka "
-                "menggunakan emoticons, serta hanya ingin merespon percakapan tentang diabetes saja, diluar topik diabetes kamu "
-                "tidak suka."
-            )
-        })
-        
-        # Set language to Indonesian
-        session['conversation'].insert(1, {
-            "role": "system",
-            "content": "Prioritaskan menggunakan bahasa Indonesia. Tidak membalas dengan bahasa lainnya."
-        })
-        
-        # Dokter
-        session['conversation'].insert(2, {
-            "role": "system",
-            "content": "Jika menanyakan rekomendasi dokter, berikan nama dokternya dan alamat rumah sakitnya dengan dummy data."
-        })
+        if len(session['conversation']) == 1:
+            session['conversation'].insert(0, {
+                "role": "system",
+                "content": (
+                    "Kamu adalah DiaPrognosis dengan panggilan Dian, chatbot konsultan diabetes yang gaul sekali dan suka menggunakan emoticons."
+                )
+            })
+            session['conversation'].insert(1, {
+                "role": "system",
+                "content": "Hanya menanggapi percakapan tentang Diabetes. TIDAK MENJAWAB ATAU MENANGGAPI PERCAKAPAN SELAIN DIABETES."
+            })
+            session['conversation'].insert(2, {
+                "role": "system",
+                "content": "Bahasa kamu hanya bahasa Indonesia. Tidak menanggapi percakapan dengan bahasa selain Indonesia."
+            })
+            session['conversation'].insert(3, {
+                "role": "system",
+                "content": "Jika menanyakan rekomendasi dokter, berikan nama dokternya dan alamat rumah sakitnya dengan dummy data."
+            })
 
-        # Call Groq API for chat response
         chat_completion = client.chat.completions.create(
             messages=session['conversation'],
-            model="llama3-8b-8192",
+            model="llama3-70b-8192",
         )
 
         bot_response = chat_completion.choices[0].message.content
-
-        # Add the bot response to the conversation history
         session['conversation'].append(
             {"role": "assistant", "content": bot_response})
 
-        # Remove the role definition after the first message
-        session['conversation'] = session['conversation'][1:]
-
-        # Store the bot response in the database
-        insert_message('Diaprognosis', bot_response)
+        # Save bot response to the database linked to the user
+        insert_message(username, bot_response, 'bot')
 
         return jsonify(response=bot_response)
 
-# Define route for prediction
+
 @app.route('/predict', methods=['POST'])
+@login_required
 def predict():
     if request.method == 'POST':
         # Get form data
@@ -113,16 +162,15 @@ def predict():
         gender = int(request.form['gender'])
 
         # Feature Scaling
-        input_data = np.array([[age, bmi, hypertension, heart_disease, smoking_history,
-                                blood_glucose_level, HbA1c_level, gender]])
+        input_data = np.array([[age, bmi, hypertension, heart_disease,
+                              smoking_history, blood_glucose_level, HbA1c_level, gender]])
         scaled_input = scaler.transform(input_data)
 
         # Prepare payload for scoring
         payload_scoring = {
             "input_data": [
                 {
-                    "fields": ['age', 'bmi', 'hypertension', 'heart_disease', 'smoking_history',
-                               'blood_glucose_level', 'HbA1c_level', 'gender'],
+                    "fields": ['age', 'bmi', 'hypertension', 'heart_disease', 'smoking_history', 'blood_glucose_level', 'HbA1c_level', 'gender'],
                     "values": scaled_input.tolist()
                 }
             ]
@@ -140,7 +188,8 @@ def predict():
         )
 
         try:
-            prediction = response_scoring.json()['predictions'][0]['values'][0][0]
+            prediction = response_scoring.json(
+            )['predictions'][0]['values'][0][0]
 
             # Interpret prediction
             if prediction == 0:
@@ -153,22 +202,30 @@ def predict():
             print(f"KeyError: {e}")
             result = 'Error: Prediksi tidak berhasil, silakan coba lagi.'
 
+        username = session.get('username', 'User')
         # Store the form inputs and the prediction result in the database
-        insert_message('User', f"Form Input: Age={age}, BMI={bmi}, Hypertension={hypertension}, Heart Disease={heart_disease}, Smoking History={smoking_history}, Blood Glucose Level={blood_glucose_level}, HbA1c Level={HbA1c_level}, Gender={gender}")
-        insert_message('Diaprognosis', f"Prediction Result: {result}")
+        insert_message(
+            username, f"Form Input: Age={age}, BMI={bmi}, Hypertension={hypertension}, Heart Disease={heart_disease}, Smoking History={smoking_history}, Blood Glucose Level={blood_glucose_level}, HbA1c Level={HbA1c_level}, Gender={gender}")
+        insert_message('Diaprognosis', f"Prediction Result: {result}", 'bot')
 
         return jsonify(prediction=result)
 
+
 @app.route('/chat-history', methods=['GET', 'POST'])
+@login_required
 def chat_history():
+    username = session['username']
     if request.method == 'POST':
         keyword = request.form.get('keyword', '').lower()
-        messages = get_all_messages()
+        messages = get_messages_by_user(username)
         if keyword:
-            messages = [message for message in messages if keyword in message[2].lower()]
+            messages = [
+                message for message in messages if keyword in message[2].lower()]
     else:
-        messages = get_all_messages()
+        messages = get_messages_by_user(username)
     return render_template('chat_history.html', messages=messages)
 
+
 if __name__ == '__main__':
+    init_db()
     app.run(debug=True)

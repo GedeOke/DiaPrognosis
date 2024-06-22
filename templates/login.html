@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiaPrognosis - Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../static/css/loginRegister.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="sortcut icon" href="static/img/Logo_DiaPrognosis.png">
+</head>
+
+<body class="flex items-center justify-center h-screen">
+    <div class="container p-8 rounded-lg shadow-lg w-full max-w-md">
+        <div class="logo-container">
+            <img src="../static/img/Logo_DiaPrognosis.png" alt="Logo DiaPrognosis">
+            <h1>DiaPrognosis</h1>
+        </div>
+        <h2 class="text-3xl font-bold mb-6 text-center">Login</h2>
+        <p class="mb-6 text-center">Silakan login dulu ya biar bisa lanjut! 😊🔐</p>
+        <form method="POST" action="{{ url_for('login') }}" autocomplete="on">
+            <div class="mb-4">
+                <label class="block text-sm font-bold mb-2" for="username">Username</label>
+                <input
+                    class="shadow appearance-none border rounded w-full py-3 px-4 leading-tight focus:outline-none focus:shadow-outline"
+                    id="username" type="text" name="username" required autocomplete="username">
+            </div>
+            <div class="mb-6">
+                <label class="block text-sm font-bold mb-2" for="password">Password</label>
+                <input
+                    class="shadow appearance-none border rounded w-full py-3 px-4 mb-3 leading-tight focus:outline-none focus:shadow-outline"
+                    id="password" type="password" name="password" required autocomplete="current-password">
+            </div>
+            <div class="flex items-center justify-between">
+                <button class="py-2 px-4 rounded focus:outline-none focus:shadow-outline font-semibold"
+                    type="submit">Login</button>
+                <a class="inline-block align-baseline font-bold text-sm" href="{{ url_for('register') }}">Belum punya
+                    akun? Daftar</a>
+            </div>
+        </form>
+    </div>
+</body>
+
+</html>

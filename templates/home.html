@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DiaPrognosis - Predict Your Health</title>
+    <title>DiaPrognosis - Sahabat Prediksi Diabetesmu</title>
     <link rel="stylesheet" href="/static/css/home.css">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
@@ -13,42 +13,55 @@
 
 <body class="flex flex-col min-h-screen">
 
+    <!-- Logout button -->
+    <div class="w-full p-4 flex justify-end">
+        <button onclick="openLogoutModal()"
+            class="bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:from-red-500 hover:via-red-600 hover:to-red-700 text-white font-bold py-2 px-4 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-110">
+            Keluar 🚪
+        </button>
+    </div>
+
     <div class="flex-grow flex flex-col items-center justify-center text-center px-4">
         <img src="static/img/Logo_DiaPrognosis.png" alt="Diabetes Logo"
             class="chat-icon animate__animated animate__fadeIn mb-4 w-1/2 mx-auto md:w-1/4">
         <h1 class="animate__animated animate__fadeInUp text-3xl font-bold mb-4">DiaPrognosis</h1>
-        <p class="animate__animated animate__fadeInUp text-lg mb-6 animate__delay-1s">Sahabat Anda dalam memprediksi
-            diabetes dan memberikan wawasan kesehatan.</p>
+        <p class="animate__animated animate__fadeInUp text-lg mb-6 animate__delay-1s">Sahabat kamu buat prediksi
+            diabetes dan ngasih wawasan kesehatan. 💉✨</p>
         <form id="chatForm" onsubmit="handleFormSubmit(event)" method="get"
             class="w-full max-w-sm mx-auto animate__animated animate__fadeInUp animate__delay-2s">
-            <input type="text" name="message" id="message" placeholder="Apa yang bisa saya bantu hari ini?"
+            <input type="text" name="message" id="message" placeholder="Apa yang bisa aku bantu hari ini? 🤔"
                 class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4">
             <button type="submit"
                 class="btn-primary w-full py-3 px-6 rounded transition duration-300 ease-in-out transform hover:scale-105">Mulai
-                Percakapan</button>
+                Ngobrol 💬</button>
         </form>
     </div>
 
     <footer class="footer rounded-lg shadow p-2">
         <div class="max-w-screen-xl mx-auto p-4 text-center">
             <span class="text-sm">
-                Developed by Team 14 for Massive Project from Infinite Learning. Last updated: Jun 14, 2024. View on 
+                Developed by Team 14 for Massive Project from Infinite Learning. Last updated: Jun 14, 2024. View on
                 <a href="https://github.com/GedeOke/DiaPrognosis" target="_blank" class="hover:underline">GitHub</a>.
             </span>
         </div>
     </footer>
-    
-    <script type="module" src="../static/js/home.js"></script>
 
-    <script>
-        function handleFormSubmit(event) {
-            event.preventDefault();
-            const message = document.getElementById('message').value;
-            sessionStorage.setItem('initialMessage', message);
-            window.location.href = "/chat";
-        }
-    </script>
+    <!-- Logout Confirmation Modal -->
+    <div id="logoutModal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden">
+        <div class="bg-gray-900 text-gray-200 rounded-lg shadow-lg p-6 w-80">
+            <h2 class="text-xl font-bold mb-4">Konfirmasi Keluar</h2>
+            <p class="mb-4">Kamu yakin mau keluar? 🤔</p>
+            <div class="flex justify-end">
+                <button onclick="closeLogoutModal()"
+                    class="bg-gray-300 text-gray-900 hover:bg-gray-400 font-bold py-2 px-4 rounded mr-2">Batal
+                    ❌</button>
+                <button onclick="handleLogout()"
+                    class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Keluar 🚪</button>
+            </div>
+        </div>
+    </div>
 
+    <script src="../static/js/home.js"></script>
 </body>
 
 </html>
