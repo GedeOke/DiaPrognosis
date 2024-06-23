@@ -15,22 +15,17 @@ warnings.filterwarnings('ignore')
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
-# Load data
 data = pd.read_csv('Data/diabetes_prediction_dataset.csv')
 
-# Replace values in 'smoking_history' and 'gender' columns
 data['smoking_history'].replace(
     {'never': 2, 'No Info': 3, 'current': 4, 'former': 5, 'not current': 6, 'ever': 7}, inplace=True)
 data['gender'].replace({'Male': 2, 'Female': 3, 'Other': 3}, inplace=True)
 
-# Feature Scaling Using StandardScaler
 scaler = StandardScaler()
 scaler.fit(data.drop('diabetes', axis=1))
 
-# Setup Groq client
-GROQ_API_KEY = ""
+GROQ_API_KEY = "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"
 client = Groq(api_key=GROQ_API_KEY)
-
 
 def login_required(f):
     @wraps(f)
@@ -40,24 +35,20 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-
 @app.route('/')
 @login_required
 def base():
     return render_template('home.html')
-
 
 @app.route('/home')
 @login_required
 def home():
     return render_template('home.html')
 
-
 @app.route('/chat')
 @login_required
 def chat():
     return render_template('chatroom.html')
-
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -72,7 +63,6 @@ def register():
         return redirect(url_for('login'))
 
     return render_template('register.html')
-
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -90,19 +80,20 @@ def login():
 
     return render_template('login.html')
 
-
 @app.route('/logout')
 def logout():
     session.pop('username', None)
     flash('You have been logged out.', 'info')
     return redirect(url_for('login'))
 
+def format_message(message):
+    formatted_message = message.replace('\n', '<br>')
+    return formatted_message
 
 @app.route('/predict', methods=['POST'])
 @login_required
 def predict():
     if request.method == 'POST':
-        # Get form data
         age = float(request.form['age'])
         bmi = float(request.form['bmi'])
         hypertension = int(request.form['hypertension'])
@@ -112,11 +103,9 @@ def predict():
         HbA1c_level = float(request.form['HbA1c_level'])
         gender = int(request.form['gender'])
         
-        # Feature Scaling
         input_data = np.array([[age, bmi, hypertension, heart_disease, smoking_history, blood_glucose_level, HbA1c_level, gender]])
         scaled_input = scaler.transform(input_data)
         
-        # Prepare payload for scoring
         payload_scoring = {
             "input_data": [
                 {
@@ -126,7 +115,7 @@ def predict():
             ]
         }
         
-        API_KEY = ""
+        API_KEY = "z8WrJu92peRLlQCeE3a32S-b1nu7Wk_7OljysvmLIb4i"
         token_response = requests.post('https://iam.cloud.ibm.com/identity/token', data={"apikey": API_KEY, "grant_type": 'urn:ibm:params:oauth:grant-type:apikey'})
         mltoken = token_response.json()["access_token"]
         
@@ -142,7 +131,6 @@ def predict():
         except KeyError as e:
             result = 'Error: Prediksi tidak berhasil, silakan coba lagi.'
         
-        # Save input data and result in session
         session['last_input'] = {
             'age': age, 'bmi': bmi, 'hypertension': hypertension, 'heart_disease': heart_disease,
             'smoking_history': smoking_history, 'blood_glucose_level': blood_glucose_level, 
@@ -150,10 +138,14 @@ def predict():
         }
 
         username = session.get('username', 'User')
-        insert_message(username, f"Form Input: Age={age}, BMI={bmi}, Hypertension={hypertension}, Heart Disease={heart_disease}, Smoking History={smoking_history}, Blood Glucose Level={blood_glucose_level}, HbA1c Level={HbA1c_level}, Gender={gender}", 'bot')
-        insert_message('Diaprognosis', f"Prediction Result: {result}", 'bot')
+        formatted_input = format_message(f"Form Input:<br>Age={age}<br>BMI={bmi}<br>Hypertension={hypertension}<br>Heart Disease={heart_disease}<br>Smoking History={smoking_history}<br>Blood Glucose Level={blood_glucose_level}<br>HbA1c Level={HbA1c_level}<br>Gender={gender}")
+        insert_message(username, formatted_input, 'Dian')
+        insert_message('Dian', f"Prediction Result: {result}", 'Dian')
+        
+        session['prediction_result'] = result
+        session['result_position'] = len(get_messages_by_user(username)) 
+        
         return jsonify(prediction=result)
-
 
 @app.route('/chat-response', methods=['POST'])
 @login_required
@@ -170,12 +162,11 @@ def chat_response():
         
         if len(session['conversation']) == 1:
             session['conversation'].insert(0, {"role": "system", "content": (
-                "Kamu adalah DiaPrognosis dengan panggilan Dian, chatbot konsultan diabetes yang gaul sekali dan suka menggunakan emoticons.")})
+                "Kamu adalah DiaPrognosis dengan panggilan Dian, chatDian konsultan diabetes yang gaul sekali dan suka menggunakan emoticons.")})
             session['conversation'].insert(1, {"role": "system", "content": "Hanya menanggapi percakapan tentang Diabetes. TIDAK MENJAWAB ATAU MENANGGAPI PERCAKAPAN SELAIN DIABETES."})
             session['conversation'].insert(2, {"role": "system", "content": "Bahasa kamu hanya bahasa Indonesia. Tidak menanggapi percakapan dengan bahasa selain Indonesia."})
             session['conversation'].insert(3, {"role": "system", "content": "Jika menanyakan rekomendasi dokter, berikan nama dokternya dan alamat rumah sakitnya dengan dummy data."})
 
-        # Append the last input data to the conversation
         if 'last_input' in session:
             session['conversation'].append({
                 "role": "system", 
@@ -187,11 +178,10 @@ def chat_response():
             model="llama3-70b-8192",
         )
 
-        bot_response = chat_completion.choices[0].message.content
-        session['conversation'].append({"role": "assistant", "content": bot_response})
-        insert_message(username, bot_response, 'bot')
-        return jsonify(response=bot_response)
-
+        Dian_response = chat_completion.choices[0].message.content
+        session['conversation'].append({"role": "assistant", "content": Dian_response})
+        insert_message(username, Dian_response, 'Dian')
+        return jsonify(response=Dian_response)
 
 @app.route('/chat-history', methods=['GET', 'POST'])
 @login_required
@@ -207,6 +197,12 @@ def chat_history():
         messages = get_messages_by_user(username)
     return render_template('chat_history.html', messages=messages)
 
+@app.route('/get-username')
+def get_username():
+    if 'username' in session:
+        return jsonify(username=session['username'])
+    else:
+        return jsonify(username=None), 401
 
 if __name__ == '__main__':
     init_db()

@@ -4,26 +4,38 @@ import { saveMessageToSessionStorage, deleteAllMessagesFromSessionStorage } from
 import { loadMessagesFromSessionStorage } from './components/loadMessagesFromSessionStorage.js';
 import { createForm } from './components/createForm.js';
 
+let username = null;
+
 document.addEventListener('DOMContentLoaded', (event) => {
+    fetch('/get-username')
+        .then(response => response.json())
+        .then(data => {
+            if (data.username) {
+                username = data.username;
+                sessionStorage.setItem('username', username); // Store username in session storage
+            } else {
+                console.error('Username not found.');
+            }
+        })
+        .catch(error => console.error('Error fetching username:', error));
+
     initializeChat();
     loadMessagesFromSessionStorage();
 
-    // Check if form was displayed before refresh
     if (sessionStorage.getItem('formDisplayed') === 'true') {
         const messagesDiv = document.getElementById('messages');
         const formPosition = parseInt(sessionStorage.getItem('formPosition'), 10);
         createForm(messagesDiv, formPosition);
     }
 
-    // Check if prediction result was saved in session storage
     const predictionResult = sessionStorage.getItem('predictionResult');
     const resultPosition = parseInt(sessionStorage.getItem('resultPosition'), 10);
-    if (predictionResult && resultPosition !== null) {
+    if (predictionResult && !isNaN(resultPosition)) {
         const messagesDiv = document.getElementById('messages');
         const resultDiv = document.createElement('div');
         resultDiv.className = 'message left';
         resultDiv.innerHTML = `
-            <div class="name">Chatbot</div>
+            <div class="name">Dian</div>
             <div class="bubble">Hasil prediksi: ${predictionResult}</div>
         `;
         messagesDiv.insertBefore(resultDiv, messagesDiv.children[resultPosition]);
@@ -31,8 +43,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
     const initialMessage = sessionStorage.getItem('initialMessage');
     if (initialMessage) {
-        sendMessage(initialMessage, true); // Send the message immediately
-        sessionStorage.removeItem('initialMessage'); // Ensure message is processed only once
+        sendMessage(initialMessage, true);
+        sessionStorage.removeItem('initialMessage');
     }
 });
 
@@ -52,10 +64,16 @@ function sendMessage(initialMessage = '', isInitial = false) {
 
     if (message.trim() === '') return;
 
-    displayMessage('User', message, 'right');
-    saveMessageToSessionStorage('User', message, 'right');
+    username = sessionStorage.getItem('username');
+    if (!username) {
+        console.error('Username not set.');
+        return;
+    }
+
+    displayMessage(username, message, 'right'); // Display user message
+    saveMessageToSessionStorage(username, message, 'right');
     botResponse(message).then(botMessage => {
-        saveMessageToSessionStorage('Diaprognosis', botMessage, 'left');
+        saveMessageToSessionStorage('Dian', botMessage, 'left');
     });
 }
 
@@ -73,8 +91,8 @@ function deleteAllMessages() {
     const messagesDiv = document.getElementById('messages');
     messagesDiv.innerHTML = '';
     deleteAllMessagesFromSessionStorage();
-    // Remove form from session storage
     sessionStorage.removeItem('formDisplayed');
     sessionStorage.removeItem('formPosition');
     sessionStorage.removeItem('predictionResult');
+    sessionStorage.removeItem('resultPosition');
 }

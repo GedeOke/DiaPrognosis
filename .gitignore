@@ -1,5 +1,4 @@
 database/__pycache__
-database/database.db
 DiaPrognosis_IBM.py
 test
 venvMassive
@@ -11,7 +10,6 @@ DiaPrognosis.zip
 __pycache__
 penting.txt
 .venv
-db.py
 db.py.txt
 history.db
 testForAnotherUpdate.py.txt

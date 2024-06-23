@@ -8,7 +8,7 @@ export function botResponse(userMessage) {
 
         botMessageDiv.className = 'message left';
         botMessageDiv.innerHTML = `
-            <div class="name">DiaPrognosis</div>
+            <div class="name">Dian</div>
             <div class="bubble">...</div>
         `;
         messagesDiv.appendChild(botMessageDiv);

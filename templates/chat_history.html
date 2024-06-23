@@ -32,13 +32,13 @@
             <div id="messages" class="overflow-y-auto">
                 {% for message in messages %}
                 <div class="message {{ 'right' if message[4] == 'user' else 'left' }}">
-                    <div class="name font-bold">{{ message[1] }}</div>
-                    <div class="bubble">{{ message[2] }}</div>
+                    <div class="name font-bold">{{ message[1] if message[4] == 'user' else 'Dian' }}</div>
+                    <div class="bubble">{{ message[2] | safe }}</div>
                     <div class="timestamp text-xs">{{ message[3] }}</div>
                 </div>
                 {% endfor %}
             </div>
-        </div>
+        </div>     
 
         <button type="button"
             class="w-full flex items-center justify-center w-1/2 px-5 py-2 text-sm text-white-700 transition-colors duration-200 bg-blue-500 hover:bg-blue-700 rounded-lg gap-x-2 sm:w-auto hover:bg-gray-100 dark:hover:bg-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700"

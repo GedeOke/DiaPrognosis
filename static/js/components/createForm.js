@@ -67,26 +67,23 @@ export function createForm(messagesDiv, position = null) {
     const submitButton = formDiv.querySelector('.submitForm');
     submitButton.addEventListener('click', submitForm);
 
-    // Save form position to session storage
     const formPosition = Array.from(messagesDiv.children).indexOf(formDiv);
     sessionStorage.setItem('formDisplayed', 'true');
     sessionStorage.setItem('formPosition', formPosition);
 
-    // Ensure scroll to the bottom
     setTimeout(() => {
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
-    }, 100); // Adjust the delay if needed
+    }, 100);
 }
 
 async function submitForm(event) {
     const form = event.target.closest('form');
     const formData = new FormData(form);
 
-    // Display loading message
     const loadingDiv = document.createElement('div');
     loadingDiv.className = 'message left';
     loadingDiv.innerHTML = `
-        <div class="name">Chatbot</div>
+        <div class="name">Dian</div>
         <div class="bubble">Sedang memproses...</div>
     `;
     document.getElementById('messages').appendChild(loadingDiv);
@@ -99,27 +96,23 @@ async function submitForm(event) {
         });
         const result = await response.json();
 
-        // Remove loading message
         document.getElementById('messages').removeChild(loadingDiv);
 
-        // Display prediction result
         const resultDiv = document.createElement('div');
         resultDiv.className = 'message left';
         resultDiv.innerHTML = `
-            <div class="name">Chatbot</div>
+            <div class="name">Dian</div>
             <div class="bubble">Hasil prediksi: ${result.prediction}</div>
         `;
         document.getElementById('messages').appendChild(resultDiv);
 
-        // Save prediction result and position to session storage
         sessionStorage.setItem('predictionResult', result.prediction);
-        const resultPosition = Array.from(messagesDiv.children).indexOf(resultDiv);
+        const resultPosition = Array.from(document.getElementById('messages').children).indexOf(resultDiv);
         sessionStorage.setItem('resultPosition', resultPosition);
 
-        // Ensure scroll to the bottom
         setTimeout(() => {
             document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
-        }, 100); // Adjust the delay if needed
+        }, 100);
     } catch (error) {
         console.error('Error:', error);
     }
