@@ -28,7 +28,7 @@ scaler = StandardScaler()
 scaler.fit(data.drop('diabetes', axis=1))
 
 # Setup Groq client
-GROQ_API_KEY = "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"
+GROQ_API_KEY = ""
 client = Groq(api_key=GROQ_API_KEY)
 
 
@@ -98,55 +98,6 @@ def logout():
     return redirect(url_for('login'))
 
 
-@app.route('/chat-response', methods=['POST'])
-@login_required
-def chat_response():
-    if request.method == 'POST':
-        user_message = request.form['message']
-        username = session.get('username', 'User')
-
-        if 'conversation' not in session:
-            session['conversation'] = []
-
-        session['conversation'].append(
-            {"role": "user", "content": user_message})
-        insert_message(username, user_message, 'user')
-
-        if len(session['conversation']) == 1:
-            session['conversation'].insert(0, {
-                "role": "system",
-                "content": (
-                    "Kamu adalah DiaPrognosis dengan panggilan Dian, chatbot konsultan diabetes yang gaul sekali dan suka menggunakan emoticons."
-                )
-            })
-            session['conversation'].insert(1, {
-                "role": "system",
-                "content": "Hanya menanggapi percakapan tentang Diabetes. TIDAK MENJAWAB ATAU MENANGGAPI PERCAKAPAN SELAIN DIABETES."
-            })
-            session['conversation'].insert(2, {
-                "role": "system",
-                "content": "Bahasa kamu hanya bahasa Indonesia. Tidak menanggapi percakapan dengan bahasa selain Indonesia."
-            })
-            session['conversation'].insert(3, {
-                "role": "system",
-                "content": "Jika menanyakan rekomendasi dokter, berikan nama dokternya dan alamat rumah sakitnya dengan dummy data."
-            })
-
-        chat_completion = client.chat.completions.create(
-            messages=session['conversation'],
-            model="llama3-70b-8192",
-        )
-
-        bot_response = chat_completion.choices[0].message.content
-        session['conversation'].append(
-            {"role": "assistant", "content": bot_response})
-
-        # Save bot response to the database linked to the user
-        insert_message(username, bot_response, 'bot')
-
-        return jsonify(response=bot_response)
-
-
 @app.route('/predict', methods=['POST'])
 @login_required
 def predict():
@@ -160,12 +111,11 @@ def predict():
         blood_glucose_level = float(request.form['blood_glucose_level'])
         HbA1c_level = float(request.form['HbA1c_level'])
         gender = int(request.form['gender'])
-
+        
         # Feature Scaling
-        input_data = np.array([[age, bmi, hypertension, heart_disease,
-                              smoking_history, blood_glucose_level, HbA1c_level, gender]])
+        input_data = np.array([[age, bmi, hypertension, heart_disease, smoking_history, blood_glucose_level, HbA1c_level, gender]])
         scaled_input = scaler.transform(input_data)
-
+        
         # Prepare payload for scoring
         payload_scoring = {
             "input_data": [
@@ -175,40 +125,72 @@ def predict():
                 }
             ]
         }
-
-        API_KEY = "z8WrJu92peRLlQCeE3a32S-b1nu7Wk_7OljysvmLIb4i"
-        token_response = requests.post('https://iam.cloud.ibm.com/identity/token', data={
-                                       "apikey": API_KEY, "grant_type": 'urn:ibm:params:oauth:grant-type:apikey'})
+        
+        API_KEY = ""
+        token_response = requests.post('https://iam.cloud.ibm.com/identity/token', data={"apikey": API_KEY, "grant_type": 'urn:ibm:params:oauth:grant-type:apikey'})
         mltoken = token_response.json()["access_token"]
-
+        
         response_scoring = requests.post(
             'https://us-south.ml.cloud.ibm.com/ml/v4/deployments/a1b17c39-babf-4999-b3d9-57d13c34ee2d/predictions?version=2021-05-01',
             json=payload_scoring,
             headers={'Authorization': 'Bearer ' + mltoken}
         )
-
+        
         try:
-            prediction = response_scoring.json(
-            )['predictions'][0]['values'][0][0]
-
-            # Interpret prediction
-            if prediction == 0:
-                result = 'Tidak menderita diabetes'
-            else:
-                result = 'Menderita diabetes'
-
+            prediction = response_scoring.json()['predictions'][0]['values'][0][0]
+            result = 'Menderita diabetes' if prediction == 1 else 'Tidak menderita diabetes'
         except KeyError as e:
-            # Handle missing 'predictions' key
-            print(f"KeyError: {e}")
             result = 'Error: Prediksi tidak berhasil, silakan coba lagi.'
+        
+        # Save input data and result in session
+        session['last_input'] = {
+            'age': age, 'bmi': bmi, 'hypertension': hypertension, 'heart_disease': heart_disease,
+            'smoking_history': smoking_history, 'blood_glucose_level': blood_glucose_level, 
+            'HbA1c_level': HbA1c_level, 'gender': gender, 'prediction': result
+        }
 
         username = session.get('username', 'User')
-        # Store the form inputs and the prediction result in the database
-        insert_message(
-            username, f"Form Input: Age={age}, BMI={bmi}, Hypertension={hypertension}, Heart Disease={heart_disease}, Smoking History={smoking_history}, Blood Glucose Level={blood_glucose_level}, HbA1c Level={HbA1c_level}, Gender={gender}")
+        insert_message(username, f"Form Input: Age={age}, BMI={bmi}, Hypertension={hypertension}, Heart Disease={heart_disease}, Smoking History={smoking_history}, Blood Glucose Level={blood_glucose_level}, HbA1c Level={HbA1c_level}, Gender={gender}", 'bot')
         insert_message('Diaprognosis', f"Prediction Result: {result}", 'bot')
-
         return jsonify(prediction=result)
+
+
+@app.route('/chat-response', methods=['POST'])
+@login_required
+def chat_response():
+    if request.method == 'POST':
+        user_message = request.form['message']
+        username = session.get('username', 'User')
+        
+        if 'conversation' not in session:
+            session['conversation'] = []
+        
+        session['conversation'].append({"role": "user", "content": user_message})
+        insert_message(username, user_message, 'user')
+        
+        if len(session['conversation']) == 1:
+            session['conversation'].insert(0, {"role": "system", "content": (
+                "Kamu adalah DiaPrognosis dengan panggilan Dian, chatbot konsultan diabetes yang gaul sekali dan suka menggunakan emoticons.")})
+            session['conversation'].insert(1, {"role": "system", "content": "Hanya menanggapi percakapan tentang Diabetes. TIDAK MENJAWAB ATAU MENANGGAPI PERCAKAPAN SELAIN DIABETES."})
+            session['conversation'].insert(2, {"role": "system", "content": "Bahasa kamu hanya bahasa Indonesia. Tidak menanggapi percakapan dengan bahasa selain Indonesia."})
+            session['conversation'].insert(3, {"role": "system", "content": "Jika menanyakan rekomendasi dokter, berikan nama dokternya dan alamat rumah sakitnya dengan dummy data."})
+
+        # Append the last input data to the conversation
+        if 'last_input' in session:
+            session['conversation'].append({
+                "role": "system", 
+                "content": f"Data terakhir: {session['last_input']}"
+            })
+
+        chat_completion = client.chat.completions.create(
+            messages=session['conversation'],
+            model="llama3-70b-8192",
+        )
+
+        bot_response = chat_completion.choices[0].message.content
+        session['conversation'].append({"role": "assistant", "content": bot_response})
+        insert_message(username, bot_response, 'bot')
+        return jsonify(response=bot_response)
 
 
 @app.route('/chat-history', methods=['GET', 'POST'])
