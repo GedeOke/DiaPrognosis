@@ -24,7 +24,7 @@ data['gender'].replace({'Male': 2, 'Female': 3, 'Other': 3}, inplace=True)
 scaler = StandardScaler()
 scaler.fit(data.drop('diabetes', axis=1))
 
-GROQ_API_KEY = "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"
+GROQ_API_KEY = "ISI SENDIRI"
 client = Groq(api_key=GROQ_API_KEY)
 
 def login_required(f):
@@ -115,7 +115,7 @@ def predict():
             ]
         }
         
-        API_KEY = "z8WrJu92peRLlQCeE3a32S-b1nu7Wk_7OljysvmLIb4i"
+        API_KEY = "ISI SENDIRI"
         token_response = requests.post('https://iam.cloud.ibm.com/identity/token', data={"apikey": API_KEY, "grant_type": 'urn:ibm:params:oauth:grant-type:apikey'})
         mltoken = token_response.json()["access_token"]
         
